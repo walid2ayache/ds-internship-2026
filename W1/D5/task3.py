@@ -110,19 +110,4 @@ print("Predictions:", predictions)
 
 
 
-def fit_gradient_descent(X,y,learning_rate=0.01,n_iterations=1000):
-    n=X.shape[0]
-    X_b=np.column_stack([X,np.ones(n)])
-    n_features=X_b.shape[1]
-    rng=np.random.default_rng(42)
-    w=rng.standard_normal(n_features)*0.01
-    history=[]
-    for i in range(n_iterations):
-        y_pred=X_b@w
-        error=y_pred-y
-        cost=np.mean(error**2)
-        history.append(cost)
-        gradient=(2/n)*(X_b.T@error)
-            
-        
-            
+

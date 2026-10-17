@@ -63,6 +63,6 @@ logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 try:
     data = int("not_a_number")
 except ValueError:
-    logging.error("Could not convert to int")
+    logging.error("Could not convert to int", exc_info=True)
 
 
