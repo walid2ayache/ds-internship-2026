@@ -1,29 +1,3 @@
-"""
-=============================================================================
-WEEK 1 - DAY 6: TASK 3 - END-TO-END PIPELINE FROM SCRATCH
-=============================================================================
-Topics Covered:
-  1. Combining Day 5 Preprocessing:
-     - train_test_split (stratified/random index shuffle)
-     - StandardScaler (fit on train, transform on train & test)
-  2. Training pure NumPy KNNClassifier on scaled data
-  3. Evaluating with full Day 6 metrics suite
-  4. Decision boundary plotting (2D)
-=============================================================================
-"""
-
-import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.datasets import make_moons
-
-from task1_knn import KNNClassifier
-from task2_metrics import (
-    accuracy_score,
-    precision_score,
-    recall_score,
-    f1_score,
-    confusion_matrix
-)
 
 
 # =============================================================================
