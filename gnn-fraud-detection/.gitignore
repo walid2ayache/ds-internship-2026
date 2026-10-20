@@ -1,5 +1,8 @@
 .venv/
-data/
+/data/
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
+torchinductor_*/
+torch_geometric.nn.conv.*.py
+.claude/settings.local.json

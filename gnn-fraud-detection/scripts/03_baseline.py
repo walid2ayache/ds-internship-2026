@@ -15,6 +15,7 @@ import os
 import sys
 
 import numpy as np
+import torch
 import xgboost as xgb
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
@@ -22,6 +23,8 @@ from src.data import ILLICIT, LICIT, get_split, load_elliptic, load_time_steps
 from src.metrics import best_threshold, evaluate, per_step_f1
 
 SEED = 42
+DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+print(f"XGBoost device: {DEVICE}")
 N_LOCAL = 93  # first 93 columns of x = local features (the rest are aggregated)
 
 data = load_elliptic()
@@ -39,7 +42,7 @@ def run(name, cols, weighted):
         subsample=0.8, colsample_bytree=0.8,
         scale_pos_weight=float(n_neg / n_pos) if weighted else 1.0,
         eval_metric="aucpr", early_stopping_rounds=50,
-        random_state=SEED, n_jobs=-1,
+        random_state=SEED, n_jobs=-1, device=DEVICE, tree_method="hist",
     )
     model.fit(X[tr][:, cols], y[tr], eval_set=[(X[va][:, cols], y[va])], verbose=False)
 

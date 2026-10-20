@@ -1,0 +1,213 @@
+{
+  "xgb": [
+    {
+      "name": "xgb_all",
+      "feats": "all",
+      "weighted": false,
+      "val_ap": 0.9815565455316675,
+      "val_f1_at_thr": 0.9402985074626866,
+      "threshold": 0.09,
+      "test_pr_auc": 0.7900466217257652,
+      "test_f1": 0.6781223805532272,
+      "precision": 0.6208749040675364,
+      "recall": 0.7469990766389658,
+      "best_iteration": 932
+    },
+    {
+      "name": "xgb_all_weighted",
+      "feats": "all",
+      "weighted": true,
+      "val_ap": 0.9886319788403161,
+      "val_f1_at_thr": 0.9613445378151261,
+      "threshold": 0.4599999999999999,
+      "test_pr_auc": 0.7894690926120376,
+      "test_f1": 0.7416666666666667,
+      "precision": 0.7437325905292479,
+      "recall": 0.739612188365651,
+      "best_iteration": 323
+    },
+    {
+      "name": "xgb_all_deg_contrast",
+      "feats": "all_deg_contrast",
+      "weighted": false,
+      "val_ap": 0.9788540333536813,
+      "val_f1_at_thr": 0.9282136894824707,
+      "threshold": 0.16999999999999998,
+      "test_pr_auc": 0.7955763763856116,
+      "test_f1": 0.6869118905047049,
+      "precision": 0.6398406374501993,
+      "recall": 0.7414589104339797,
+      "best_iteration": 444
+    },
+    {
+      "name": "xgb_all_deg_contrast_w",
+      "feats": "all_deg_contrast",
+      "weighted": true,
+      "val_ap": 0.987638378508376,
+      "val_f1_at_thr": 0.9595959595959596,
+      "threshold": 0.4599999999999999,
+      "test_pr_auc": 0.7960022984385853,
+      "test_f1": 0.7439252336448599,
+      "precision": 0.7530747398297067,
+      "recall": 0.7349953831948292,
+      "best_iteration": 432
+    },
+    {
+      "name": "xgb_local_deg_contrast",
+      "feats": "local_deg_contrast",
+      "weighted": false,
+      "val_ap": 0.9912442170268904,
+      "val_f1_at_thr": 0.9585798816568047,
+      "threshold": 0.38999999999999996,
+      "test_pr_auc": 0.7958836810545833,
+      "test_f1": 0.7537063605930177,
+      "precision": 0.7817460317460317,
+      "recall": 0.7276084949215144,
+      "best_iteration": 331
+    },
+    {
+      "name": "xgb_local_deg_contrast_w",
+      "feats": "local_deg_contrast",
+      "weighted": true,
+      "val_ap": 0.9851086426450155,
+      "val_f1_at_thr": 0.9506802721088435,
+      "threshold": 0.73,
+      "test_pr_auc": 0.7811208726698696,
+      "test_f1": 0.7600581677169171,
+      "precision": 0.8,
+      "recall": 0.7239150507848569,
+      "best_iteration": 57
+    },
+    {
+      "name": "xgb_local_deg_contrast_sn",
+      "feats": "local_deg_contrast_sn",
+      "weighted": false,
+      "val_ap": 0.7002160009231986,
+      "val_f1_at_thr": 0.7369385884509624,
+      "threshold": 0.19,
+      "test_pr_auc": 0.718988095890645,
+      "test_f1": 0.5260292616536237,
+      "precision": 0.41648706896551724,
+      "recall": 0.7137580794090489,
+      "best_iteration": 50
+    }
+  ],
+  "sage": [
+    {
+      "name": "sage_local",
+      "feats": "local",
+      "per_seed": [
+        {
+          "seed": 0,
+          "val_ap": 0.9290721693687963,
+          "threshold": 0.61,
+          "test_pr_auc": 0.7110274078026021,
+          "test_f1": 0.6975476839237057,
+          "precision": 0.851063829787234,
+          "recall": 0.5909510618651893
+        },
+        {
+          "seed": 1,
+          "val_ap": 0.9340425818171917,
+          "threshold": 0.73,
+          "test_pr_auc": 0.715297532659705,
+          "test_f1": 0.663036902601331,
+          "precision": 0.9614035087719298,
+          "recall": 0.5060018467220684
+        },
+        {
+          "seed": 2,
+          "val_ap": 0.926262374373767,
+          "threshold": 0.69,
+          "test_pr_auc": 0.7095006424364076,
+          "test_f1": 0.6740524781341107,
+          "precision": 0.9145569620253164,
+          "recall": 0.5337026777469991
+        }
+      ],
+      "mean": {
+        "val_ap": 0.929792375186585,
+        "test_pr_auc": 0.7119418609662382,
+        "test_f1": 0.6782123548863824,
+        "precision": 0.9090081001948268,
+        "recall": 0.5435518621114189
+      },
+      "std": {
+        "val_ap": 0.003216823410412064,
+        "test_pr_auc": 0.0024533178224061033,
+        "test_f1": 0.014392751365780396
+      }
+    },
+    {
+      "name": "sage_local_deg_contrast",
+      "feats": "local_deg_contrast",
+      "per_seed": [
+        {
+          "seed": 0,
+          "val_ap": 0.9436172414816991,
+          "threshold": 0.6699999999999999,
+          "test_pr_auc": 0.6694820806861255,
+          "test_f1": 0.6662837449741528,
+          "precision": 0.8814589665653495,
+          "recall": 0.5355493998153278
+        },
+        {
+          "seed": 1,
+          "val_ap": 0.9427567557873989,
+          "threshold": 0.6599999999999999,
+          "test_pr_auc": 0.6720239432728476,
+          "test_f1": 0.6701090074584051,
+          "precision": 0.8848484848484849,
+          "recall": 0.5392428439519852
+        },
+        {
+          "seed": 2,
+          "val_ap": 0.9451489767929079,
+          "threshold": 0.6699999999999999,
+          "test_pr_auc": 0.6793819922777757,
+          "test_f1": 0.6689497716894978,
+          "precision": 0.8759342301943199,
+          "recall": 0.541089566020314
+        }
+      ],
+      "mean": {
+        "val_ap": 0.943840991354002,
+        "test_pr_auc": 0.673629338745583,
+        "test_f1": 0.6684475080406852,
+        "precision": 0.8807472272027181,
+        "recall": 0.538627269929209
+      },
+      "std": {
+        "val_ap": 0.0009893527644597505,
+        "test_pr_auc": 0.004198018052091732,
+        "test_f1": 0.001601532567687568
+      }
+    }
+  ],
+  "ensemble_rank": {
+    "name": "ensemble_rank",
+    "xgb": "xgb_local_deg_contrast",
+    "sage": "sage_local",
+    "w_xgb": 0.95,
+    "val_ap": 0.9918897806451059,
+    "threshold": 0.83,
+    "test_pr_auc": 0.7959061667769726,
+    "test_f1": 0.4628844114528102,
+    "precision": 0.32465600595016736,
+    "recall": 0.8060941828254847
+  },
+  "ensemble_prob": {
+    "name": "ensemble_prob",
+    "xgb": "xgb_local_deg_contrast",
+    "sage": "sage_local",
+    "w_xgb": 1.0,
+    "val_ap": 0.9912442170268904,
+    "threshold": 0.38999999999999996,
+    "test_pr_auc": 0.7958836810545833,
+    "test_f1": 0.7537063605930177,
+    "precision": 0.7817460317460317,
+    "recall": 0.7276084949215144
+  },
+  "winner": "ensemble_rank",
+  "note": "All candidates selected by VAL PR-AUC only; test reported."
+}

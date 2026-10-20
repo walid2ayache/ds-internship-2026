@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Elliptic Fraud Detection — Live Demo</title>
+  <meta name="description" content="A live portfolio demo of an XGBoost model detecting illicit Bitcoin transactions on the Elliptic graph.">
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+  <div class="orb orb-a"></div>
+  <div class="orb orb-b"></div>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <span class="brand-mark">◈</span>
+      <span class="brand-text">ELLIPTIC <em>FRAUD LAB</em></span>
+    </a>
+    <nav class="tabs" id="tabs" aria-label="Sections">
+      <button class="tab active" data-tab="explorer">Explorer</button>
+      <button class="tab" data-tab="performance">Performance</button>
+      <button class="tab" data-tab="about">About</button>
+    </nav>
+    <div class="model-pill"><span class="pulse"></span><span id="model-name">XGBoost</span></div>
+  </header>
+
+  <main>
+    <section class="panel-page active" id="tab-explorer">
+      <div class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">TRANSACTION RISK · ELLIPTIC BITCOIN</p>
+          <h1>Score a transaction<br><span>before it settles.</span></h1>
+          <p class="lede">A live demo of the final-fit XGBoost model: 188 graph-aware features,
+            a validation-tuned threshold, and per-transaction explanations. Select any
+            historical transaction to inspect its risk.</p>
+          <div class="hero-actions">
+            <button class="btn primary" id="random-btn">Inspect a random transaction</button>
+            <button class="btn ghost" data-jump="performance">See model performance</button>
+          </div>
+          <p class="micro">Demo rows are historical labelled test transactions. Ground truth is
+            shown for illustration only — the model never sees it at inference.</p>
+        </div>
+        <div class="stat-grid" id="stat-grid" aria-label="Model metrics"></div>
+      </div>
+
+      <div class="explorer-grid">
+        <div class="panel table-panel">
+          <div class="panel-head">
+            <div>
+              <h2>Transaction explorer</h2>
+              <p id="result-count">Loading transactions…</p>
+            </div>
+            <div class="filters">
+              <label>Step<select id="filter-step"><option value="all">All</option></select></label>
+              <label>Label<select id="filter-label">
+                <option value="all">All</option>
+                <option value="1">Illicit</option>
+                <option value="0">Licit</option>
+              </select></label>
+              <label>Outcome<select id="filter-outcome">
+                <option value="all">All</option>
+                <option value="correct">Correct</option>
+                <option value="errors">Errors</option>
+              </select></label>
+              <label>Risk<select id="filter-risk">
+                <option value="all">All</option>
+                <option value="flagged">Flagged</option>
+                <option value="clear">Clear</option>
+              </select></label>
+              <input id="filter-q" type="search" placeholder="Search node id…" autocomplete="off">
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Node</th><th>Step</th><th>Risk score</th><th>Status</th><th>True label</th></tr>
+              </thead>
+              <tbody id="tx-body"></tbody>
+            </table>
+          </div>
+          <div class="table-foot">
+            <span id="table-foot">—</span>
+            <span class="legend"><i class="dot risk"></i> Flagged ≥ threshold
+              <i class="dot safe"></i> Clear</span>
+          </div>
+        </div>
+
+        <aside class="panel detail-panel" id="detail-panel" aria-live="polite">
+          <div class="detail-empty" id="detail-empty">
+            <div class="empty-icon">⌁</div>
+            <h3>Select a transaction</h3>
+            <p>Click any row to see the live risk score and the features that moved it.</p>
+          </div>
+          <div id="detail-content" class="hidden"></div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="panel-page" id="tab-performance">
+      <div class="section-head">
+        <p class="eyebrow">MODEL CARD</p>
+        <h1>Performance, honestly reported.</h1>
+        <p class="lede">Single temporal split: train 1–29, validation 30–34, test 35–49.
+          The final fit retrains on 1–34 and keeps the train-only threshold.</p>
+      </div>
+
+      <div class="perf-grid">
+        <div class="panel">
+          <h2>Headline comparison</h2>
+          <table class="metric-table" id="metric-table">
+            <thead><tr><th>Model</th><th>PR-AUC</th><th>F1</th><th>Precision</th><th>Recall</th></tr></thead>
+            <tbody></tbody>
+          </table>
+          <p class="micro">Illicit-class metrics on test steps 35–49. SAGE is shown for context;
+            the app serves the XGBoost model.</p>
+        </div>
+        <div class="panel threshold-panel">
+          <h2>Decision threshold</h2>
+          <div class="big-threshold" id="threshold-value">0.39</div>
+          <p class="micro">Chosen by maximising illicit F1 on the validation block, then applied
+            unchanged to test. The final fit reuses the train-only threshold.</p>
+        </div>
+      </div>
+
+      <div class="figure-grid">
+        <figure class="panel">
+          <img src="/static/img/per_step_f1.png" alt="Per-time-step test F1 for XGBoost and SAGE">
+          <figcaption>Per-time-step F1. The drop after step 43 is partly prior shift and tiny
+            positive support, not only representation failure.</figcaption>
+        </figure>
+        <figure class="panel">
+          <img src="/static/img/pr_curves.png" alt="Test precision-recall curves">
+          <figcaption>Precision–recall on test: final-fit XGBoost, train-only XGBoost, and SAGE.</figcaption>
+        </figure>
+      </div>
+
+      <div class="panel callout">
+        <h3>What the numbers do not say</h3>
+        <p>Validation is saturated and anti-correlated with test. The final fit uses validation
+          labels, so <strong>0.803</strong> is a deployment-style number, not a held-out
+          model-selection result. The comparable train-only result is <strong>0.796 PR-AUC /
+          0.754 F1</strong>.</p>
+      </div>
+    </section>
+
+    <section class="panel-page" id="tab-about">
+      <div class="section-head">
+        <p class="eyebrow">ABOUT THE BUILD</p>
+        <h1>From graph features<br><span>to a live score.</span></h1>
+        <p class="lede">A portfolio project on the Elliptic Bitcoin dataset. The honest finding:
+          graph message passing did not beat a strong tabular model — graph-derived features did.</p>
+      </div>
+
+      <div class="about-grid">
+        <div class="panel">
+          <h2>How a score is made</h2>
+          <ol class="steps">
+            <li><span>01</span><div><strong>Graph-aware features.</strong> 93 local transaction
+              features, log in/out degree, and 93 neighbour-contrast features
+              (<code>x_local − mean(neighbour x_local)</code>).</div></li>
+            <li><span>02</span><div><strong>XGBoost ensemble.</strong> Five seeded models,
+              332 trees each, trained on steps 1–34. Probabilities are averaged.</div></li>
+            <li><span>03</span><div><strong>Explain.</strong> XGBoost contributions show which
+              features pushed the score toward illicit or licit, in log-odds.</div></li>
+          </ol>
+        </div>
+
+        <div class="panel">
+          <h2>Dataset</h2>
+          <dl class="facts">
+            <div><dt>Nodes</dt><dd>203,769</dd></div>
+            <div><dt>Edges</dt><dd>234,355</dd></div>
+            <div><dt>Features</dt><dd>165 (93 local + 72 aggregated)</dd></div>
+            <div><dt>Time steps</dt><dd>49</dd></div>
+            <div><dt>Illicit share</dt><dd>6.5% test · 16.8% val</dd></div>
+            <div><dt>Cross-time edges</dt><dd>0</dd></div>
+          </dl>
+        </div>
+
+        <div class="panel">
+          <h2>Limitations</h2>
+          <ul class="limits">
+            <li><strong>Validation is saturated.</strong> ~0.95 PR-AUC on val does not rank
+              configs; test is the only honest check.</li>
+            <li><strong>Prior shift.</strong> Thresholds tuned at 16.8% prevalence are applied
+              at 6.5%; steps 43–49 have only 2–56 positives each.</li>
+            <li><strong>Final fit uses val labels.</strong> 0.803 is deployment-style;
+              0.796 is the train-only comparison.</li>
+            <li><strong>Graph context is required.</strong> Degree and contrast features need
+              the transaction graph; this is not a plug-in scorer for arbitrary raw rows.</li>
+            <li><strong>Demo only.</strong> Historical labelled nodes, not a production
+              fraud system.</li>
+          </ul>
+        </div>
+
+        <div class="panel">
+          <h2>API</h2>
+          <p class="micro">The demo is a live model, not a static mock. Score a 188-feature
+            vector with:</p>
+          <pre><code>curl -X POST http://127.0.0.1:8000/api/predict \
+  -H "Content-Type: application/json" \
+  -d '{"features": [ ...188 floats... ]}'</code></pre>
+          <p class="micro">Endpoints: <code>/api/meta</code>, <code>/api/transactions</code>,
+            <code>/api/transaction/&lt;id&gt;</code>, <code>/api/predict</code>.</p>
+        </div>
+      </div>
+
+      <div class="panel callout">
+        <h3>Stack</h3>
+        <p>Python stdlib HTTP server · XGBoost 3.4 · NumPy · vanilla HTML/CSS/JS · no frontend
+          framework, no external CDN. The same code runs locally and behind a Procfile.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>◈ Elliptic Fraud Lab</span>
+    <span>Portfolio demo · Elliptic Bitcoin dataset · not a production system</span>
+  </footer>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
