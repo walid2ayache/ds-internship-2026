@@ -6,6 +6,7 @@ Endpoints:
   GET  /api/meta                 model metrics, threshold, feature names
   GET  /api/transactions         demo rows with live probabilities
   GET  /api/transaction/<id>     one row + XGBoost contributions
+  GET  /api/example              a valid 188-feature example vector
   POST /api/predict              {"features": [188 floats]}
   GET  /health
 
@@ -129,6 +130,10 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(demo.meta)
             if path == "/api/transactions":
                 return self._json(demo.transactions())
+            if path == "/api/example":
+                return self._json({"features": demo.X[0].tolist(),
+                                   "node": int(demo.node[0]),
+                                   "step": int(demo.step[0])})
             if path.startswith("/api/transaction/"):
                 try:
                     i = int(path.rsplit("/", 1)[1])

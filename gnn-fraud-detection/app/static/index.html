@@ -19,6 +19,7 @@
     </a>
     <nav class="tabs" id="tabs" aria-label="Sections">
       <button class="tab active" data-tab="explorer">Explorer</button>
+      <button class="tab" data-tab="score">Score</button>
       <button class="tab" data-tab="performance">Performance</button>
       <button class="tab" data-tab="about">About</button>
     </nav>
@@ -36,6 +37,7 @@
             historical transaction to inspect its risk.</p>
           <div class="hero-actions">
             <button class="btn primary" id="random-btn">Inspect a random transaction</button>
+            <button class="btn ghost" data-jump="score">Score your own vector</button>
             <button class="btn ghost" data-jump="performance">See model performance</button>
           </div>
           <p class="micro">Demo rows are historical labelled test transactions. Ground truth is
@@ -94,6 +96,59 @@
           </div>
           <div id="detail-content" class="hidden"></div>
         </aside>
+      </div>
+    </section>
+
+    <section class="panel-page" id="tab-score">
+      <div class="section-head">
+        <p class="eyebrow">CUSTOM TRANSACTION</p>
+        <h1>Paste a feature vector.<br><span>Get a decision.</span></h1>
+        <p class="lede">The model needs 188 numbers in a fixed order. Paste values separated by
+          commas, spaces or newlines, or a JSON array. Use “Load example” if you need a valid
+          starting point; replace its values with your own.</p>
+      </div>
+
+      <div class="score-grid">
+        <div class="panel score-input">
+          <div class="panel-head">
+            <div>
+              <h2>Feature vector</h2>
+              <p id="feature-count">0 / 188 numbers</p>
+            </div>
+            <div class="score-actions">
+              <button class="btn ghost" id="example-btn">Load example</button>
+              <button class="btn ghost" id="clear-btn">Clear</button>
+            </div>
+          </div>
+          <div class="score-body">
+            <textarea id="feature-input" spellcheck="false"
+              placeholder="0.12, -0.45, 0.03, ..."></textarea>
+          </div>
+          <div class="score-footer">
+            <span class="micro">Order: local 0–92 · log out-degree · log in-degree · contrast 0–92 · use full precision</span>
+            <button class="btn primary" id="score-btn">Score transaction</button>
+          </div>
+          <div id="score-error" class="error-banner hidden"></div>
+        </div>
+
+        <aside class="panel score-result" id="score-result" aria-live="polite">
+          <div class="detail-empty" id="score-empty">
+            <div class="empty-icon">⌁</div>
+            <h3>No vector yet</h3>
+            <p>Paste 188 numbers or load an example to see the model’s decision and the
+              features that moved it.</p>
+          </div>
+          <div id="score-content" class="hidden"></div>
+        </aside>
+      </div>
+
+      <div class="panel callout">
+        <h3>What is a feature vector?</h3>
+        <p>It is the same 188-feature representation used in the Explorer: 93 local transaction
+          features, two log-degree values, and 93 neighbour-contrast values. A raw transaction
+          cannot be scored without its graph context — if you paste arbitrary zeros or
+          unrelated numbers, the score is not meaningful. Paste full-precision values: rounding
+          a feature can move the score.</p>
       </div>
     </section>
 

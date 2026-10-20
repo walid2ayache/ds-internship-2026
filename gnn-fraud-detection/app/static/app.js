@@ -144,6 +144,135 @@ function contribRows(items, cls, maxAbs) {
   }).join("");
 }
 
+function parseFeatures(text) {
+  const expected = state.meta ? state.meta.feature_count : 188;
+  const cleaned = text.replace(/[\[\]\n\r\t;]/g, " ").trim();
+  const parts = cleaned.split(/[,\s]+/).filter(Boolean);
+  const nums = parts.map(Number);
+  if (!nums.length) throw new Error("Paste a feature vector first.");
+  if (nums.length !== expected) {
+    throw new Error(`Expected ${expected} numbers, got ${nums.length}.`);
+  }
+  if (!nums.every(Number.isFinite)) throw new Error("Every value must be a number.");
+  return nums;
+}
+
+function updateFeatureCount() {
+  const expected = state.meta ? state.meta.feature_count : 188;
+  const text = $("feature-input").value.trim();
+  const count = text
+    ? text.replace(/[\[\]\n\r\t;]/g, " ").trim().split(/[,\s]+/).filter(Boolean).length
+    : 0;
+  $("feature-count").textContent = `${count} / ${expected} numbers`;
+}
+
+function showScoreError(message) {
+  const el = $("score-error");
+  if (!message) {
+    el.textContent = "";
+    el.classList.add("hidden");
+    return;
+  }
+  el.textContent = message;
+  el.classList.remove("hidden");
+}
+
+function renderCustomResult(d) {
+  const all = [...d.top_positive, ...d.top_negative];
+  const maxAbs = Math.max(0, ...all.map((c) => Math.abs(c.contrib)));
+
+  $("score-empty").classList.add("hidden");
+  const content = $("score-content");
+  content.classList.remove("hidden");
+  content.innerHTML = `
+    <div class="detail-inner">
+      <div class="detail-kicker">Custom feature vector</div>
+      <h3 class="detail-title">Model decision</h3>
+
+      <div class="score-row">
+        <span class="score-value">${d.prob.toFixed(3)}</span>
+        <span class="score-unit">risk score</span>
+      </div>
+      <div class="gauge">
+        <i style="width:${(d.prob * 100).toFixed(1)}%"></i>
+        <b style="left:${(d.threshold * 100).toFixed(1)}%"></b>
+      </div>
+      <div class="gauge-labels"><span>0.00</span><span>threshold ${d.threshold.toFixed(2)}</span><span>1.00</span></div>
+
+      <div class="meta-row">
+        <span class="chip">${d.flagged ? "Flagged" : "Clear"}</span>
+        <span class="chip">threshold ${d.threshold.toFixed(2)}</span>
+        <span class="chip">${(state.meta ? state.meta.feature_count : 188)} features</span>
+      </div>
+
+      <div class="contrib-section">
+        <h4>Pushes toward illicit</h4>
+        <p>Positive XGBoost contributions, in log-odds.</p>
+        ${contribRows(d.top_positive, "pos", maxAbs)}
+      </div>
+      <div class="contrib-section">
+        <h4>Pushes toward licit</h4>
+        <p>Negative XGBoost contributions, in log-odds.</p>
+        ${contribRows(d.top_negative, "neg", maxAbs)}
+      </div>
+      <p class="micro">No ground truth exists for a pasted vector. Contributions explain the
+        model, not causation.</p>
+    </div>`;
+}
+
+async function scoreCustom() {
+  let features;
+  try {
+    features = parseFeatures($("feature-input").value);
+    showScoreError("");
+  } catch (err) {
+    showScoreError(err.message);
+    return;
+  }
+
+  const btn = $("score-btn");
+  const label = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "Scoring…";
+  try {
+    const res = await fetch("/api/predict", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ features }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "prediction failed");
+    renderCustomResult(data);
+  } catch (err) {
+    showScoreError(`Could not score this vector: ${err.message}`);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = label;
+  }
+}
+
+async function loadExample() {
+  try {
+    const res = await fetch("/api/example");
+    if (!res.ok) throw new Error("example request failed");
+    const data = await res.json();
+    $("feature-input").value = data.features.map((v) => v.toPrecision(8)).join(", ");
+    updateFeatureCount();
+    showScoreError("");
+    scoreCustom();
+  } catch (err) {
+    showScoreError(`Could not load an example: ${err.message}`);
+  }
+}
+
+function clearCustom() {
+  $("feature-input").value = "";
+  updateFeatureCount();
+  showScoreError("");
+  $("score-content").classList.add("hidden");
+  $("score-empty").classList.remove("hidden");
+}
+
 function renderDetail(d) {
   const flag = d.prob >= d.threshold;
   const all = [...d.top_positive, ...d.top_negative];
@@ -252,6 +381,14 @@ function init() {
   $("filter-q").addEventListener("input", (e) => {
     state.filter.q = e.target.value; renderTable();
   });
+  $("feature-input").addEventListener("input", updateFeatureCount);
+  $("feature-input").addEventListener("keydown", (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") scoreCustom();
+  });
+  $("score-btn").addEventListener("click", scoreCustom);
+  $("example-btn").addEventListener("click", loadExample);
+  $("clear-btn").addEventListener("click", clearCustom);
+  updateFeatureCount();
   $("random-btn").addEventListener("click", () => {
     if (!state.tx.length) return;
     const id = Math.floor(Math.random() * state.tx.length);
@@ -259,8 +396,12 @@ function init() {
     $("detail-panel").scrollIntoView({ behavior: "smooth", block: "center" });
   });
   const hash = location.hash.replace("#", "");
-  if (["explorer", "performance", "about"].includes(hash)) activateTab(hash);
+  if (["explorer", "score", "performance", "about"].includes(hash)) activateTab(hash);
   boot();
+  if (new URLSearchParams(location.search).get("example") === "1") {
+    activateTab("score");
+    loadExample();
+  }
 }
 
 document.addEventListener("DOMContentLoaded", init);

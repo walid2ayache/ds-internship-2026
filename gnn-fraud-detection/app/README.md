@@ -9,6 +9,8 @@ scoring and per-transaction explanations.
 - **Explorer**: 400 labelled historical test transactions (steps 35–42), filterable by
   step, label and risk. Click a row for the live probability, the threshold, and the
   XGBoost feature contributions that moved the score.
+- **Score**: paste 188 comma/space-separated numbers (or load a valid example) and get a
+  live decision plus the top positive and negative contributions.
 - **Performance**: the honest model card — final-fit XGBoost (PR-AUC 0.803, F1 0.787),
   train-only XGBoost (0.796 / 0.754), and SAGE-local (0.712 / 0.666) — plus the saved
   per-step F1 and PR-curve figures.
@@ -16,6 +18,8 @@ scoring and per-transaction explanations.
   prior shift, final fit using validation labels).
 
 ![Explorer](screenshot.png)
+
+![Score](screenshot-score.png)
 
 ![Performance](screenshot-performance.png)
 
@@ -27,6 +31,8 @@ The model and demo rows are already built into `app/model/` and `app/data/`.
 .venv\Scripts\python.exe app\server.py
 # open http://127.0.0.1:8000
 ```
+
+For a pre-scored example, open **http://127.0.0.1:8000/?example=1#score**.
 
 To rebuild the artifacts from the dataset (requires the full training environment and
 `data/elliptic/`):
@@ -58,6 +64,7 @@ web: python app/server.py --host 0.0.0.0 --port $PORT
 | GET | `/api/meta` | metrics, threshold, feature names, demo metadata |
 | GET | `/api/transactions` | demo rows with probabilities |
 | GET | `/api/transaction/<id>` | one row, top positive/negative contributions |
+| GET | `/api/example` | a valid 188-feature example vector |
 | POST | `/api/predict` | score a JSON body `{"features": [...188 floats]}` |
 | GET | `/health` | `{"ok": true, "rows": 400}` |
 
@@ -75,9 +82,9 @@ curl -X POST http://127.0.0.1:8000/api/predict \
 app/
   server.py          stdlib HTTP server + JSON API
   static/
-    index.html       Explorer / Performance / About
+    index.html       Explorer / Score / Performance / About
     style.css        dark portfolio theme, responsive
-    app.js           vanilla JS: filters, detail drawer, charts
+    app.js           vanilla JS: filters, detail drawer, paste-and-score, charts
     img/             per_step_f1.png, pr_curves.png
   data/
     demo.npz         400 rows: X (188), y, step, node, prob
