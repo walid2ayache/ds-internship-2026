@@ -1,0 +1,9 @@
+# Day 6 EDA - notebook requirements
+# Tested with Python 3.12 / pandas 3.0 / matplotlib 3.11 / seaborn 0.13
+pandas>=2.0
+numpy>=1.24
+matplotlib>=3.7
+seaborn>=0.12
+jupyter>=1.0
+nbconvert>=7.0
+nbformat>=5.0
